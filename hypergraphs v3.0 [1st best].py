@@ -80,14 +80,13 @@ def interactive_hypergraph(num_vars, clauses, threshold=0):
         mode='markers+text',
         hoverinfo='text',
         marker=dict(
-            showscale=True,
             colorscale='Blues',
             reversescale=False,
             color=[],
             size=10,
             colorbar=dict(
                 thickness=15,
-                title='Numer klauzuli',
+                title='Stopień węzła',
                 xanchor='left',
                 titleside='right'
             ),
@@ -103,11 +102,10 @@ def interactive_hypergraph(num_vars, clauses, threshold=0):
         node_trace['marker']['color'] += (len(adjacencies[1]),)
 
     layout = go.Layout(
-        title='Interaktywna wizualizacja hipergrafu po usunięciu węzłów',
         titlefont=dict(size=16),
         showlegend=False,
         hovermode='closest',
-        margin=dict(b=20, l=5, r=5, t=40),
+        margin=dict(b=5, l=5, r=5, t=5),
         annotations=[dict(
             text="",
             showarrow=False,
@@ -121,6 +119,6 @@ def interactive_hypergraph(num_vars, clauses, threshold=0):
 filename = "DIMACS_files/turbo_easy/example_2.cnf"
 num_vars, clauses = read_dimacs_cnf(filename)
 
-draw_hypergraph(num_vars, clauses, threshold=0)
+draw_hypergraph(num_vars, clauses, threshold=10)
 
-interactive_hypergraph(num_vars, clauses, threshold=0)
+interactive_hypergraph(num_vars, clauses, threshold=10)
