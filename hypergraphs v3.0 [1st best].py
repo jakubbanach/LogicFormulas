@@ -17,7 +17,7 @@ def read_dimacs_cnf(filename):
                 clauses.append(clause)
     return num_vars, clauses
 
-def draw_hypergraph(num_vars, clauses):
+def draw_hypergraph(num_vars, clauses, threshold=0):
     G = nx.Graph()
 
     for var in range(1, num_vars + 1):
@@ -27,6 +27,9 @@ def draw_hypergraph(num_vars, clauses):
         G.add_nodes_from(clause)
         for pair in itertools.combinations(clause, 2):
             G.add_edge(*pair, clause=i+1)
+
+    nodes_to_remove = [node for node, degree in dict(G.degree()).items() if degree <= threshold]
+    G.remove_nodes_from(nodes_to_remove)
 
     node_colors = []
     for node in G.nodes():
@@ -41,7 +44,7 @@ def draw_hypergraph(num_vars, clauses):
     
     nx.draw(G, pos, with_labels=True, font_weight='bold', node_color=node_colors, cmap=plt.cm.Blues, node_size=800)
 
-def interactive_hypergraph(num_vars, clauses):
+def interactive_hypergraph(num_vars, clauses, threshold=0):
     G = nx.Graph()
 
     for var in range(1, num_vars + 1):
@@ -50,6 +53,9 @@ def interactive_hypergraph(num_vars, clauses):
         G.add_nodes_from(clause)
         for pair in itertools.combinations(clause, 2):
             G.add_edge(*pair, clause=i+1)
+
+    nodes_to_remove = [node for node, degree in dict(G.degree()).items() if degree <= threshold]
+    G.remove_nodes_from(nodes_to_remove)
 
     pos = nx.spring_layout(G)
 
@@ -96,7 +102,7 @@ def interactive_hypergraph(num_vars, clauses):
         node_trace['marker']['color'] += (len(adjacencies[1]),)
 
     layout = go.Layout(
-        title='Interaktywna wizualizacja hipergrafu',
+        title='Interaktywna wizualizacja hipergrafu po usunięciu węzłów',
         titlefont=dict(size=16),
         showlegend=False,
         hovermode='closest',
@@ -111,8 +117,9 @@ def interactive_hypergraph(num_vars, clauses):
     fig = go.Figure(data=[edge_trace, node_trace], layout=layout)
     fig.show()
 
-
 filename = "DIMACS_files/turbo_easy/example_2.cnf"
 num_vars, clauses = read_dimacs_cnf(filename)
 draw_hypergraph(num_vars, clauses)
+draw_hypergraph(num_vars, clauses, threshold=4)
 interactive_hypergraph(num_vars, clauses)
+interactive_hypergraph(num_vars, clauses, threshold=4)
