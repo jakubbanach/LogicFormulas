@@ -1,0 +1,7 @@
+node2vec
+argparse
+itertools
+matplotlib
+networkx
+plotly
+nbformat>=4.2.0
