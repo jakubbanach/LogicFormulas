@@ -24,8 +24,8 @@ def draw_hypergraph(num_vars, clauses, threshold=0):
         G.add_node(var)
 
     for i, clause in enumerate(clauses):
-        G.add_nodes_from(clause)
-        for pair in itertools.combinations(clause, 2):
+        G.add_nodes_from(map(abs, clause))
+        for pair in itertools.combinations(map(abs, clause), 2):
             G.add_edge(*pair, clause=i+1)
 
     nodes_to_remove = [node for node, degree in dict(G.degree()).items() if degree <= threshold]
@@ -35,7 +35,7 @@ def draw_hypergraph(num_vars, clauses, threshold=0):
     for node in G.nodes():
         color = 0
         for i, clause in enumerate(clauses):
-            if node in clause:
+            if abs(node) in map(abs, clause):
                 color = i + 1
                 break
         node_colors.append(color)
@@ -49,9 +49,10 @@ def interactive_hypergraph(num_vars, clauses, threshold=0):
 
     for var in range(1, num_vars + 1):
         G.add_node(var)
+
     for i, clause in enumerate(clauses):
-        G.add_nodes_from(clause)
-        for pair in itertools.combinations(clause, 2):
+        G.add_nodes_from(map(abs, clause))
+        for pair in itertools.combinations(map(abs, clause), 2):
             G.add_edge(*pair, clause=i+1)
 
     nodes_to_remove = [node for node, degree in dict(G.degree()).items() if degree <= threshold]
@@ -81,7 +82,7 @@ def interactive_hypergraph(num_vars, clauses, threshold=0):
         marker=dict(
             showscale=True,
             colorscale='Blues',
-            reversescale=True,
+            reversescale=False,
             color=[],
             size=10,
             colorbar=dict(
@@ -119,7 +120,7 @@ def interactive_hypergraph(num_vars, clauses, threshold=0):
 
 filename = "DIMACS_files/turbo_easy/example_2.cnf"
 num_vars, clauses = read_dimacs_cnf(filename)
-draw_hypergraph(num_vars, clauses)
-draw_hypergraph(num_vars, clauses, threshold=4)
-interactive_hypergraph(num_vars, clauses)
-interactive_hypergraph(num_vars, clauses, threshold=4)
+
+draw_hypergraph(num_vars, clauses, threshold=0)
+
+interactive_hypergraph(num_vars, clauses, threshold=0)
