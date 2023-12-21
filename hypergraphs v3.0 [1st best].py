@@ -3,7 +3,6 @@ import networkx as nx
 import itertools
 import plotly.graph_objs as go
 
-
 def read_dimacs_cnf(filename):
     clauses = []
     with open(filename, 'r') as file:
@@ -119,6 +118,6 @@ def interactive_hypergraph(num_vars, clauses, threshold=0):
 filename = "DIMACS_files/turbo_easy/example_2.cnf"
 num_vars, clauses = read_dimacs_cnf(filename)
 
-draw_hypergraph(num_vars, clauses, threshold=10)
+draw_hypergraph(num_vars, clauses, threshold=8)
 
-interactive_hypergraph(num_vars, clauses, threshold=10)
+interactive_hypergraph(num_vars, clauses, threshold=0)
