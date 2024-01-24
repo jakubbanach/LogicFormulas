@@ -18,7 +18,7 @@ def read_dimacs_cnf(filename):
                 clauses.append(clause)
     return num_vars, clauses
 
-def draw_hypergraph(num_vars, clauses, threshold=0):
+def generate_hypergraph(num_vars, clauses, threshold):
     G = nx.Graph()
 
     for var in range(1, num_vars + 1):
@@ -32,6 +32,10 @@ def draw_hypergraph(num_vars, clauses, threshold=0):
     nodes_to_remove = [node for node, degree in dict(G.degree()).items() if degree <= threshold]
     G.remove_nodes_from(nodes_to_remove)
 
+    return G
+
+def draw_hypergraph(num_vars, clauses, threshold=0):
+    G = generate_hypergraph(num_vars, clauses, threshold)
     pos = nx.spring_layout(G, seed=42)
 
     node_colors = [0] * (num_vars + 1)
@@ -44,23 +48,11 @@ def draw_hypergraph(num_vars, clauses, threshold=0):
     colors = [node_colors[node] for node in G.nodes()]
 
     fig, ax = plt.subplots(figsize=(8, 8))
-    nx.draw(G, pos, with_labels=True, font_size = 10, node_color=colors, cmap=plt.cm.Blues, node_size=500, ax=ax)
+    nx.draw(G, pos, with_labels=True, font_size=10, node_color=colors, cmap=plt.cm.Blues, node_size=500, ax=ax)
     plt.show()
 
 def draw_interactive_hypergraph(num_vars, clauses, threshold=0):
-    G = nx.Graph()
-
-    for var in range(1, num_vars + 1):
-        G.add_node(var)
-
-    for i, clause in enumerate(clauses):
-        G.add_nodes_from(map(abs, clause))
-        for pair in itertools.combinations(map(abs, clause), 2):
-            G.add_edge(*pair, clause=i + 1)
-
-    nodes_to_remove = [node for node, degree in dict(G.degree()).items() if degree <= threshold]
-    G.remove_nodes_from(nodes_to_remove)
-
+    G = generate_hypergraph(num_vars, clauses, threshold)
     pos = nx.spring_layout(G, seed=42)
 
     edge_trace = go.Scatter(
