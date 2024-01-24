@@ -1,3 +1,5 @@
+import ipywidgets as widgets
+from IPython.display import display, clear_output
 import matplotlib.pyplot as plt
 import networkx as nx
 import itertools
@@ -25,25 +27,27 @@ def draw_hypergraph(num_vars, clauses, threshold=0):
     for i, clause in enumerate(clauses):
         G.add_nodes_from(map(abs, clause))
         for pair in itertools.combinations(map(abs, clause), 2):
-            G.add_edge(*pair, clause=i+1)
+            G.add_edge(*pair, clause=i + 1)
 
     nodes_to_remove = [node for node, degree in dict(G.degree()).items() if degree <= threshold]
     G.remove_nodes_from(nodes_to_remove)
 
-    node_colors = []
+    pos = nx.spring_layout(G, seed=42)
+
+    node_colors = [0] * (num_vars + 1)
     for node in G.nodes():
-        color = 0
         for i, clause in enumerate(clauses):
             if abs(node) in map(abs, clause):
-                color = i + 1
+                node_colors[node] = i + 1
                 break
-        node_colors.append(color)
 
-    pos = nx.spring_layout(G)
-    
-    nx.draw(G, pos, with_labels=True, font_weight='bold', node_color=node_colors, cmap=plt.cm.Blues, node_size=800)
+    colors = [node_colors[node] for node in G.nodes()]
 
-def interactive_hypergraph(num_vars, clauses, threshold=0):
+    fig, ax = plt.subplots(figsize=(8, 8))
+    nx.draw(G, pos, with_labels=True, font_size = 10, node_color=colors, cmap=plt.cm.Blues, node_size=500, ax=ax)
+    plt.show()
+
+def draw_interactive_hypergraph(num_vars, clauses, threshold=0):
     G = nx.Graph()
 
     for var in range(1, num_vars + 1):
@@ -52,12 +56,12 @@ def interactive_hypergraph(num_vars, clauses, threshold=0):
     for i, clause in enumerate(clauses):
         G.add_nodes_from(map(abs, clause))
         for pair in itertools.combinations(map(abs, clause), 2):
-            G.add_edge(*pair, clause=i+1)
+            G.add_edge(*pair, clause=i + 1)
 
     nodes_to_remove = [node for node, degree in dict(G.degree()).items() if degree <= threshold]
     G.remove_nodes_from(nodes_to_remove)
 
-    pos = nx.spring_layout(G)
+    pos = nx.spring_layout(G, seed=42)
 
     edge_trace = go.Scatter(
         x=[],
@@ -85,7 +89,7 @@ def interactive_hypergraph(num_vars, clauses, threshold=0):
             size=10,
             colorbar=dict(
                 thickness=15,
-                title='Stopień węzła',
+                title='Node Degree',
                 xanchor='left',
                 titleside='right'
             ),
@@ -115,9 +119,18 @@ def interactive_hypergraph(num_vars, clauses, threshold=0):
     fig = go.Figure(data=[edge_trace, node_trace], layout=layout)
     fig.show()
 
+def update_threshold(threshold_value):
+    clear_output(wait=True)
+    draw_hypergraph(num_vars, clauses, threshold=threshold_value)
+    draw_interactive_hypergraph(num_vars, clauses, threshold=threshold_value)
+
 filename = "DIMACS_files/turbo_easy/example_2.cnf"
 num_vars, clauses = read_dimacs_cnf(filename)
 
-draw_hypergraph(num_vars, clauses, threshold=8)
+draw_hypergraph(num_vars, clauses, threshold=0)
+draw_interactive_hypergraph(num_vars, clauses, threshold=0)
 
-interactive_hypergraph(num_vars, clauses, threshold=0)
+threshold_slider = widgets.FloatSlider(value=0, min=0, max=10, step=1, description='Threshold:')
+threshold_slider.observe(lambda change: update_threshold(change.new), names='value')
+
+display(threshold_slider)
