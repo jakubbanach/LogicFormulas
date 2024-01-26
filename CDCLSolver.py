@@ -12,7 +12,7 @@ class CDCLSolver:
             if conflict_clause is not None:
                 if not self.resolve_conflict(conflict_clause):
                     return "UNSAT"
-            elif all(self.assignment[1:]):  # Check all variables are assigned
+            elif all(self.assignment[1:]):
                 return "SAT"
             else:
                 var_to_assign = self.choose_variable()
@@ -58,7 +58,7 @@ class CDCLSolver:
         while len(self.decision_stack) > 0 and self.get_decision_level(self.decision_stack[-1]) > conflict_level:
             self.backtrack()
 
-        return True
+        return True  # SAT
 
     def backtrack(self):
         last_decision = self.decision_stack.pop()
